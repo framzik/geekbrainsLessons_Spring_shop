@@ -68,6 +68,8 @@ public class SecurityConfig {
                     .authorizeRequests()
                     .antMatchers("/**/*.css", "/**/*.js").permitAll()
                     .antMatchers("/product/**").permitAll()
+                    .antMatchers("/user/registration").permitAll()
+                    .antMatchers("/user/new").permitAll()
                     .antMatchers("/user/**").hasRole("ADMIN")
                     .antMatchers("/access_denied").authenticated()
                     .and()
