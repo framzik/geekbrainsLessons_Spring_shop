@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" ,
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<div th:replace="fragments/header::header"></div>
+<div th:replace="fragments/navigation::navigation"></div>
+<body>
+
+<div class="container">
+  <div class="row py-2">
+    <div class="col-12">
+      <a class="btn btn-primary" th:href="@{/category/new}">Add Category</a>
+    </div>
+
+    <div class="col-12 mt-3">
+      <form class="form-inline" th:method="get">
+
+        <div class="form-group mb-2 mr-2">
+          <label for="categoryNameFilter" class="sr-only">Category name filter</label>
+          <input type="text" class="form-control" id="categoryNameFilter" th:value="${param.categoryNameFilter}"
+                 name="categoryNameFilter" placeholder="Category name filter">
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-2">Apply</button>
+      </form>
+    </div>
+
+    <div class="col-12">
+      <table class="table table-bordered my-2">
+        <thead>
+        <tr>
+          <th scope="col" th:replace="fragments/sort_header :: sort_header_category ('Id', 'id')"></th>
+          <th scope="col" th:replace="fragments/sort_header :: sort_header_category ('Name', 'name')"></th>
+          <th scope="col"
+              th:replace="fragments/sort_header :: sort_header_category ('Description', 'description')"></th>
+          <th sec:authorize="hasRole('ADMIN')" scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="category:${categories}">
+          <th scope="row" th:text="${category.id}">1</th>
+          <td th:text="${category.name}">Other</td>
+          <td th:text="${category.description}">Best category</td>
+          <td>
+
+            <form sec:authorize="hasRole('ADMIN')">
+              <a class="btn btn-success" th:href="@{/category/{id}(id = ${category.id})}"><i
+                  class="fas fa-edit"></i></a>
+              <a class="btn btn-danger" th:href="@{/category/delete/{id}(id = ${category.id})}"><i
+                  class="far fa-trash-alt"></i></a>
+            </form>
+
+          </td>
+        </tr>
+
+        </tbody>
+      </table>
+    </div>
+    <div th:replace="fragments/pagination::category_pagination"></div>
+  </div>
+</div>
+
+<div th:replace="fragments/styles::style"></div>
+</body>
+</html>

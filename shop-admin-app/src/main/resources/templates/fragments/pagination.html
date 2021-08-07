@@ -1,0 +1,94 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="user_pagination">
+  <div class="col-12" th:if="${users.hasContent()}">
+    <nav aria-label="...">
+      <ul class="pagination">
+        <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1">Previous</a>
+        </li>
+
+        <li th:each="num : ${#numbers.sequence(1, users.totalPages)}"
+            th:classappend="${num == users.number + 1} ? 'active'"
+            class="page-item">
+          <a class="page-link"
+             th:text="${num}"
+             th:href="@{/user(page=${num}, size=${users.size}, usernameFilter=${param.usernameFilter},
+                           minAge=${param.minAge}, maxAge=${param.maxAge}, sortField=${param.sortField})}">1</a>
+        </li>
+
+        <li class="page-item">
+          <a class="page-link" href="#">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<div th:fragment="product_pagination">
+  <div class="col-12" th:if="${products.hasContent()}">
+    <nav aria-label="...">
+      <ul class="pagination">
+        <li class="page-item"
+            th:classappend="${!products.hasPrevious()} ? 'disabled'">
+
+          <a class="page-link"
+             th:href="@{/product(page=${prevPageNumber}, size=${products.size}, minCost=${param.minCost},
+                            maxCost=${param.maxCost}, sortField=${param.sortField})}"
+             tabindex="-1">Previous</a>
+        </li>
+
+        <li th:each="num : ${#numbers.sequence(1, products.totalPages)}"
+            th:classappend="${num == products.number + 1} ? 'active'"
+            class="page-item">
+          <a class="page-link"
+             th:text="${num}"
+             th:href="@{/product(page=${num}, size=${products.size},
+                           minCost=${param.minCost}, maxCost=${param.maxCost},sortField=${param.sortField})}">1</a>
+        </li>
+
+        <li class="page-item"
+            th:classappend="${!products.hasNext()} ? 'disabled'">
+
+          <a class="page-link"
+             th:href="@{/product(page=${nextPageNumber}, size=${products.size}, minCost=${param.minCost},
+                           maxCost=${param.maxCost},sortField=${param.sortField})}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<div th:fragment="category_pagination">
+  <div class="col-12" th:if="${categories.hasContent()}">
+    <nav aria-label="...">
+      <ul class="pagination">
+        <li class="page-item"
+            th:classappend="${!categories.hasPrevious()} ? 'disabled'">
+
+          <a class="page-link"
+             th:href="@{/category(page=${prevPageNumber}, size=${categories.size}, categoryNameFilter=${param.categoryNameFilter}, sortField=${param.sortField})}"
+             tabindex="-1">Previous</a>
+        </li>
+
+        <li th:each="num : ${#numbers.sequence(1, categories.totalPages)}"
+            th:classappend="${num == categories.number + 1} ? 'active'"
+            class="page-item">
+          <a class="page-link"
+             th:text="${num}"
+             th:href="@{/category(page=${num}, size=${categories.size},
+                         categoryNameFilter=${param.categoryNameFilter} ,sortField=${param.sortField})}">1</a>
+        </li>
+
+        <li class="page-item"
+            th:classappend="${!categories.hasNext()} ? 'disabled'">
+
+          <a class="page-link"
+             th:href="@{/category(page=${nextPageNumber}, size=${categories.size},categoryNameFilter=${param.categoryNameFilter} ,sortField=${param.sortField})}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" ,
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<div th:replace="fragments/header::header"></div>
+<div th:replace="fragments/navigation::navigation"></div>
+<body>
+
+<div class="container">
+  <div class="row py-2">
+    <div class="col-12">
+      <a class="btn btn-primary" th:href="@{/product/new}">Add Product</a>
+    </div>
+
+    <div class="col-12 mt-3">
+      <form class="form-inline" th:method="get">
+
+        <div class="form-group mb-2 mr-2">
+          <label for="minCost" class="sr-only">Minimal cost</label>
+          <input type="number" class="form-control" id="minCost" th:value="${param.minCost}"
+                 name="minCost" placeholder="Minimal cost">
+        </div>
+        <div class="form-group mb-2 mr-2">
+          <label for="maxCost" class="sr-only">Maximal cost</label>
+          <input type="number" class="form-control" id="maxCost" th:value="${param.maxCost}"
+                 name="maxCost" placeholder="Maximal cost">
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-2">Apply</button>
+      </form>
+    </div>
+
+    <div class="col-12">
+      <table class="table table-bordered my-2">
+        <thead>
+        <tr>
+
+          <th scope="col" th:replace="fragments/sort_header :: sort_header_product ('Id', 'id')"></th>
+          <th scope="col" th:replace="fragments/sort_header :: sort_header_product ('Title', 'title')"></th>
+          <th scope="col" th:replace="fragments/sort_header :: sort_header_product ('Cost', 'cost')"></th>
+          <th scope="col" th:replace="fragments/sort_header :: sort_header_product ('Category', 'category')"></th>
+          <th sec:authorize="hasRole('ADMIN')" scope="col">Actions</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${products.hasContent()}" th:each="product : ${products.content}">
+          <th scope="row" th:text="${product.id}">1</th>
+          <td th:text="${product.title}">Alex</td>
+          <td th:text="${product.cost}">cost</td>
+          <td th:text="${product.category.name}">category</td>
+          <td>
+
+            <form sec:authorize="hasRole('ADMIN')">
+            <a class="btn btn-success" th:href="@{/product/{id}(id = ${product.id})}"><i
+                class="fas fa-edit"></i></a>
+            <a class="btn btn-danger" th:href="@{/product/delete/{id}(id = ${product.id})}"><i
+                class="far fa-trash-alt"></i></a>
+            </form>
+
+          </td>
+        </tr>
+
+        <tr th:unless="${products.hasContent()}">
+          <td colspan="4">No data</td>
+        </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <div th:replace="fragments/pagination::product_pagination"></div>
+
+  </div>
+</div>
+
+<div th:replace="fragments/styles::style"></div>
+</body>
+</html>
