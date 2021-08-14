@@ -1,23 +1,17 @@
 package ru.khrebtov.persist.dto;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 public class UserDto {
 
     private Long id;
 
-    @NotBlank
     private String username;
 
-    @Min(value = 18)
     private Integer age;
 
-    @NotBlank
     private String password;
 
-    @NotBlank
     private String repeatPassword;
 
     private Set<RoleDto> roles;

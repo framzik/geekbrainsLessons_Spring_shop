@@ -15,7 +15,6 @@ import ru.khrebtov.persist.dto.UserDto;
 import ru.khrebtov.persist.repo.RoleRepository;
 import ru.khrebtov.shopadminapp.service.UserService;
 
-import javax.validation.Valid;
 import java.util.stream.Collectors;
 
 @Controller
@@ -70,7 +69,7 @@ public class UserController {
     }
 
     @PostMapping("/new")
-    public String create(@Valid @ModelAttribute("user") UserDto user, BindingResult result, Model model) {
+    public String create(@ModelAttribute("user") UserDto user, BindingResult result, Model model) {
         logger.info("Create user");
 
         if (result.hasErrors()) {
@@ -105,7 +104,7 @@ public class UserController {
     }
 
     @PostMapping
-    public String update(@Valid @ModelAttribute("user") UserDto user, BindingResult result, Model model) {
+    public String update(@ModelAttribute("user") UserDto user, BindingResult result, Model model) {
         logger.info("Saving user");
 
         if (result.hasErrors()) {

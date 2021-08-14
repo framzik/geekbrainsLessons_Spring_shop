@@ -14,8 +14,6 @@ import ru.khrebtov.persist.entity.Product;
 import ru.khrebtov.shopadminapp.service.CategoryService;
 import ru.khrebtov.shopadminapp.service.ProductService;
 
-import javax.validation.Valid;
-
 @Controller
 @RequestMapping(value = "/product")
 public class ProductController {
@@ -46,7 +44,7 @@ public class ProductController {
     public String newUserForm(Model model) {
         logger.info("New product page requested");
         model.addAttribute("product", new Product());
-        model.addAttribute("categories", categoryService.findAll() );
+        model.addAttribute("categories", categoryService.findAll());
 
         return "product_form";
     }
@@ -55,13 +53,13 @@ public class ProductController {
     public String editProduct(@PathVariable("id") Long id, Model model) {
         logger.info("Edit product page requested");
         model.addAttribute("product", productService.findById(id));
-        model.addAttribute("categories", categoryService.findAll() );
+        model.addAttribute("categories", categoryService.findAll());
 
         return "product_form";
     }
 
     @PostMapping
-    public String update(@Valid Product product,  BindingResult result) {
+    public String update(Product product, BindingResult result) {
         logger.info("Saving product");
 
         if (result.hasErrors()) {

@@ -1,7 +1,5 @@
 package ru.khrebtov.persist.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.util.List;
 
@@ -19,7 +17,6 @@ public class Category {
     @Column(name = "description")
     private String description;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "category")
     private List<Product> products;
 
