@@ -2,7 +2,7 @@ package ru.khrebtov.shopadminapp.controller;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import ru.khrebtov.persist.dto.RoleDto;
+import ru.khrebtov.shopadminapp.dto.RoleDto;
 
 @Component
 public class StringToRoleDtoConverter implements Converter<String, RoleDto> {

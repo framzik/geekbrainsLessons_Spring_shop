@@ -3,64 +3,88 @@ package ru.khrebtov.shopadminapp.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.khrebtov.persist.ProductListParam;
+import org.springframework.web.multipart.MultipartFile;
+import ru.khrebtov.persist.entity.Category;
+import ru.khrebtov.persist.entity.Picture;
 import ru.khrebtov.persist.entity.Product;
+import ru.khrebtov.persist.repo.CategoryRepository;
 import ru.khrebtov.persist.repo.ProductRepository;
+import ru.khrebtov.service.PictureService;
+import ru.khrebtov.shopadminapp.controller.NotFoundException;
+import ru.khrebtov.shopadminapp.dto.CategoryDto;
+import ru.khrebtov.shopadminapp.dto.ProductDto;
 
-import java.util.List;
+import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.Optional;
-
-
-import static java.util.Objects.isNull;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    private final CategoryRepository categoryRepository;
+
+    private final PictureService pictureService;
+
+    public ProductServiceImpl(ProductRepository productRepository,
+                              CategoryRepository categoryRepository,
+                              PictureService pictureService) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
+        this.pictureService = pictureService;
     }
 
     @Override
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public Page<ProductDto> findAll(Integer page, Integer size, String sortField) {
+        return productRepository.findAll(PageRequest.of(page, size, Sort.by(sortField)))
+                                .map(product -> new ProductDto(product.getId(),
+                                                               product.getName(),
+                                                               product.getDescription(),
+                                                               product.getPrice(),
+                                                               new CategoryDto(product.getCategory().getId(),
+                                                                               product.getCategory().getName())));
     }
 
     @Override
-    public Page<Product> findWithFilter(ProductListParam productListParam) {
-        Specification<Product> spec = Specification.where(null);
+    public Optional<ProductDto> findById(Long id) {
+        return productRepository.findById(id)
+                                .map(product -> new ProductDto(product.getId(),
+                                                               product.getName(),
+                                                               product.getDescription(),
+                                                               product.getPrice(),
+                                                               new CategoryDto(product.getCategory().getId(),
+                                                                               product.getCategory().getName())));
+    }
 
-        if (productListParam.getMinCost() != null) {
-            spec = spec.and(ProductSpecification.minCost(productListParam.getMinCost()));
+    @Override
+    @Transactional
+    public void save(ProductDto productDto) {
+        Product product = (productDto.getId() != null) ? productRepository.findById(productDto.getId())
+                                                                          .orElseThrow(() -> new NotFoundException(
+                                                                                  "")) : new Product();
+        Category category = categoryRepository.findById(productDto.getCategory().getId())
+                                              .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        product.setName(productDto.getName());
+        product.setCategory(category);
+        product.setPrice(productDto.getPrice());
+
+        if (productDto.getNewPictures() != null) {
+            for (MultipartFile newPicture: productDto.getNewPictures()) {
+                try {
+                    product.getPictures().add(new Picture(null,
+                                                          newPicture.getOriginalFilename(),
+                                                          newPicture.getContentType(),
+                                                          pictureService.createPicture(newPicture.getBytes()),
+                                                          product
+                    ));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
         }
-        if (productListParam.getMaxCost() != null) {
-            spec = spec.and(ProductSpecification.maxCost(productListParam.getMaxCost()));
-        }
-
-        if (isNull(productListParam.getSortField()) || productListParam.getSortField().isEmpty() ||
-                productListParam.getSortField().isBlank()) {
-            productListParam.setSortField("id");
-        }
-
-        return productRepository.findAll(spec,
-                                         PageRequest.of(
-                                                 Optional.ofNullable(productListParam.getPage()).orElse(1) - 1,
-                                                 Optional.ofNullable(productListParam.getSize()).orElse(3),
-                                                 Sort.by(Optional.ofNullable(productListParam.getSortField())
-                                                                 .filter(c -> !c.isBlank())
-                                                                 .orElse("id"))));
-    }
-
-    @Override
-    public Optional<Product> findById(Long id) {
-        return productRepository.findById(id);
-    }
-
-    @Override
-    public void save(Product product) {
         productRepository.save(product);
     }
 

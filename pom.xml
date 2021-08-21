@@ -25,6 +25,7 @@
 
     <modules>
         <module>shop-database</module>
+        <module>picture-service</module>
         <module>shop-admin-app</module>
         <module>shop-backend-api-app</module>
     </modules>

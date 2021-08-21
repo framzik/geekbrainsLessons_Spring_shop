@@ -10,8 +10,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.khrebtov.persist.UserListParams;
-import ru.khrebtov.persist.dto.RoleDto;
-import ru.khrebtov.persist.dto.UserDto;
+import ru.khrebtov.shopadminapp.dto.RoleDto;
+import ru.khrebtov.shopadminapp.dto.UserDto;
 import ru.khrebtov.persist.repo.RoleRepository;
 import ru.khrebtov.shopadminapp.service.UserService;
 

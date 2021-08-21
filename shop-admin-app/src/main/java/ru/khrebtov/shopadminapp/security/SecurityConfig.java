@@ -67,7 +67,8 @@ public class SecurityConfig {
             http
                     .authorizeRequests()
                     .antMatchers("/**/*.css", "/**/*.js").permitAll()
-                    .antMatchers("/product/**").permitAll()
+                    .antMatchers("/product/**").hasRole("ADMIN")
+                    .antMatchers("/category/**").hasRole("ADMIN")
                     .antMatchers("/user/registration").permitAll()
                     .antMatchers("/user/new").permitAll()
                     .antMatchers("/user/**").hasRole("ADMIN")

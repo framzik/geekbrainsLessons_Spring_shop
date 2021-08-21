@@ -9,26 +9,38 @@
         <runningAs username="framzik"/>
     </preConditions>
 
-    <changeSet id="0" author="aleks_ush">
+    <changeSet id="0" author="framzik">
         <tagDatabase tag="db_init"/>
     </changeSet>
 
     <include file="v-1.0/root.changelog.v-1.0.xml" relativeToChangelogFile="true"/>
 
-    <changeSet id="1000" author="aleks_ush">
+    <changeSet id="1000" author="framzik">
         <tagDatabase tag="v-1.0"/>
     </changeSet>
 
     <include file="v-2.0/root.changelog.v-2.0.xml" relativeToChangelogFile="true"/>
 
-    <changeSet id="2000" author="aleks_ush">
+    <changeSet id="2000" author="framzik">
         <tagDatabase tag="v-2.0"/>
     </changeSet>
 
     <include file="v-3.0/root.changelog.v-3.0.xml" relativeToChangelogFile="true"/>
 
-    <changeSet id="3000" author="aleks_ush">
+    <changeSet id="3000" author="framzik">
         <tagDatabase tag="v-3.0"/>
+    </changeSet>
+
+    <include file="v-4.0/root.changelog.v-4.0.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="4000" author="framzik">
+        <tagDatabase tag="v-4.0"/>
+    </changeSet>
+
+    <include file="v-5.0/root.changelog.v-5.0.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="5000" author="framzik">
+        <tagDatabase tag="v-5.0"/>
     </changeSet>
 
 </databaseChangeLog>

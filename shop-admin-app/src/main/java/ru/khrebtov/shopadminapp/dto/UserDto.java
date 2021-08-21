@@ -1,4 +1,4 @@
-package ru.khrebtov.persist.dto;
+package ru.khrebtov.shopadminapp.dto;
 
 import java.util.Set;
 

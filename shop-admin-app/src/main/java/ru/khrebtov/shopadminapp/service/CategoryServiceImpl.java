@@ -3,14 +3,14 @@ package ru.khrebtov.shopadminapp.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.khrebtov.persist.CategoryListParam;
 import ru.khrebtov.persist.entity.Category;
 import ru.khrebtov.persist.repo.CategoryRepository;
+import ru.khrebtov.shopadminapp.dto.CategoryDto;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -22,34 +22,33 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> findAll() {
-        return categoryRepository.findAll();
+    public List<CategoryDto> findAll() {
+        return categoryRepository.findAll().stream()
+                                 .map(category -> new CategoryDto(category.getId(),
+                                                                  category.getName(),
+                                                                  category.getDescription()))
+                                 .collect(Collectors.toList());
     }
 
     @Override
-    public Page<Category> findWithFilter(CategoryListParam categoryListParam) {
-        Specification<Category> spec = Specification.where(null);
-
-        if (categoryListParam.getCategoryNameFilter() != null && !categoryListParam.getCategoryNameFilter().isBlank()) {
-            spec = spec.and(CategorySpecifications.categoryPrefix(categoryListParam.getCategoryNameFilter()));
-        }
-
-        return categoryRepository.findAll(spec,
-                                      PageRequest.of(
-                                              Optional.ofNullable(categoryListParam.getPage()).orElse(1) - 1,
-                                              Optional.ofNullable(categoryListParam.getSize()).orElse(3),
-                                              Sort.by(Optional.ofNullable(categoryListParam.getSortField())
-                                                              .filter(c -> !c.isBlank())
-                                                              .orElse("id"))));
+    public Page<CategoryDto> findAll(Integer page, Integer size, String sortField) {
+        return categoryRepository.findAll(PageRequest.of(page, size, Sort.by(sortField)))
+                                 .map(category -> new CategoryDto(category.getId(),
+                                                                  category.getName(),
+                                                                  category.getDescription()));
     }
 
     @Override
-    public Optional<Category> findById(Long id) {
-        return categoryRepository.findById(id);
+    public Optional<CategoryDto> findById(Long id) {
+        return categoryRepository.findById(id)
+                                 .map(category -> new CategoryDto(category.getId(),
+                                                                  category.getName(),
+                                                                  category.getDescription()));
     }
 
     @Override
-    public void save(Category category) {
+    public void save(CategoryDto categoryDto) {
+        Category category = new Category(categoryDto.getId(), categoryDto.getName(), categoryDto.getDescription());
         categoryRepository.save(category);
     }
 

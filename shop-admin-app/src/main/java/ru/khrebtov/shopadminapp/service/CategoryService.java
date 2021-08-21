@@ -1,21 +1,20 @@
 package ru.khrebtov.shopadminapp.service;
 
 import org.springframework.data.domain.Page;
-import ru.khrebtov.persist.CategoryListParam;
-import ru.khrebtov.persist.entity.Category;
+import ru.khrebtov.shopadminapp.dto.CategoryDto;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CategoryService {
 
-    List<Category> findAll();
+    List<CategoryDto> findAll();
 
-    Page<Category> findWithFilter(CategoryListParam categoryListParam);
+    Page<CategoryDto> findAll(Integer page, Integer size, String sortField);
 
-    Optional<Category> findById(Long id);
+    Optional<CategoryDto> findById(Long id);
 
-    void save(Category category);
+    void save(CategoryDto categoryDto);
 
     void deleteById(Long id);
 }

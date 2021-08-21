@@ -9,18 +9,21 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import ru.khrebtov.persist.ProductListParam;
-import ru.khrebtov.persist.entity.Product;
+import ru.khrebtov.shopadminapp.dto.ProductDto;
 import ru.khrebtov.shopadminapp.service.CategoryService;
 import ru.khrebtov.shopadminapp.service.ProductService;
 
+import javax.validation.Valid;
+import java.util.Optional;
+
 @Controller
-@RequestMapping(value = "/product")
+@RequestMapping("/product")
 public class ProductController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     private final ProductService productService;
+
     private final CategoryService categoryService;
 
     @Autowired
@@ -31,51 +34,58 @@ public class ProductController {
     }
 
     @GetMapping
-    public String listPage(Model model,
-                           ProductListParam productListParam) {
-        logger.info("Product list page requested");
-
-        model.addAttribute("products", productService.findWithFilter(productListParam));
-
+    public String listPage(@RequestParam("page") Optional<Integer> page,
+                           @RequestParam("size") Optional<Integer> size,
+                           @RequestParam("sortField") Optional<String> sortField, Model model) {
+        model.addAttribute("products", productService.findAll(
+                page.orElse(1) - 1,
+                size.orElse(5),
+                sortField.filter(fld -> !fld.isBlank()).orElse("id")));
         return "products";
     }
 
-    @GetMapping("/new")
-    public String newUserForm(Model model) {
-        logger.info("New product page requested");
-        model.addAttribute("product", new Product());
-        model.addAttribute("categories", categoryService.findAll());
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("activePage", "Product");
+    }
 
+    @GetMapping("/new")
+    public String newProductForm(Model model) {
+        logger.info("New product page requested");
+
+        model.addAttribute("product", new ProductDto());
+        model.addAttribute("categories", categoryService.findAll());
         return "product_form";
     }
 
     @GetMapping("/{id}")
     public String editProduct(@PathVariable("id") Long id, Model model) {
         logger.info("Edit product page requested");
-        model.addAttribute("product", productService.findById(id));
-        model.addAttribute("categories", categoryService.findAll());
 
+        model.addAttribute("product", productService.findById(id)
+                                                    .orElseThrow(() -> new NotFoundException("Product not found")));
+        model.addAttribute("categories", categoryService.findAll());
         return "product_form";
     }
 
     @PostMapping
-    public String update(Product product, BindingResult result) {
+    public String update(@Valid @ModelAttribute("product") ProductDto product, BindingResult result, Model model) {
         logger.info("Saving product");
 
         if (result.hasErrors()) {
+            logger.error(result.getAllErrors().toString());
+            model.addAttribute("categories", categoryService.findAll());
             return "product_form";
         }
-
         productService.save(product);
-
         return "redirect:/product";
     }
 
-    @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") Long id) {
-        logger.info("Deleting product");
-        productService.deleteById(id);
+    @DeleteMapping("/{id}")
+    public String deleteProduct(@PathVariable("id") Long id) {
+        logger.info("Deleting product with id {}", id);
 
+        productService.deleteById(id);
         return "redirect:/product";
     }
 
