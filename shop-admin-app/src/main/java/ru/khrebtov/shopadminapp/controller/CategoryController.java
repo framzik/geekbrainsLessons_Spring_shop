@@ -12,8 +12,6 @@ import ru.khrebtov.persist.CategoryListParam;
 import ru.khrebtov.persist.entity.Category;
 import ru.khrebtov.shopadminapp.service.CategoryService;
 
-import javax.validation.Valid;
-
 @Controller
 @RequestMapping(value = "/category")
 public class CategoryController {
@@ -52,7 +50,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public String update(@Valid Category category, BindingResult result) {
+    public String update(Category category, BindingResult result) {
         logger.info("Saving category");
 
         if (result.hasErrors()) {

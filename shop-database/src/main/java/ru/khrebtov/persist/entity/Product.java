@@ -1,8 +1,6 @@
 package ru.khrebtov.persist.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "products")
@@ -13,15 +11,16 @@ public class Product {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank
     private String title;
 
-    @Min(value = 0)
     @Column(nullable = false)
     private double cost;
 
     @ManyToOne
     private Category category;
+
+    @ManyToOne
+    private Brand brand;
 
     public Product() {
     }
@@ -61,5 +60,13 @@ public class Product {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public Brand getBrand() {
+        return brand;
+    }
+
+    public void setBrand(Brand brand) {
+        this.brand = brand;
     }
 }
