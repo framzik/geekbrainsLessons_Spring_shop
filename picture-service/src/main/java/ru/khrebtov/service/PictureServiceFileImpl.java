@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,5 +62,15 @@ public class PictureServiceFileImpl implements PictureService {
             throw new RuntimeException(ex);
         }
         return fileName;
+    }
+
+    @Override
+    public List<Picture> getAllProductPictures(Long productId) {
+        return pictureRepository.getAllByProductId(productId);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        pictureRepository.deleteById(id);
     }
 }

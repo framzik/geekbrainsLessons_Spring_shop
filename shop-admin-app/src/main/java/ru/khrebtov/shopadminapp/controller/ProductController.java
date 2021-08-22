@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import ru.khrebtov.service.PictureService;
 import ru.khrebtov.shopadminapp.dto.ProductDto;
 import ru.khrebtov.shopadminapp.service.CategoryService;
 import ru.khrebtov.shopadminapp.service.ProductService;
@@ -23,14 +24,15 @@ public class ProductController {
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     private final ProductService productService;
-
     private final CategoryService categoryService;
+    private final PictureService pictureService;
 
     @Autowired
     public ProductController(ProductService productService,
-                             CategoryService categoryService) {
+                             CategoryService categoryService, PictureService pictureService) {
         this.productService = productService;
         this.categoryService = categoryService;
+        this.pictureService = pictureService;
     }
 
     @GetMapping
@@ -55,6 +57,7 @@ public class ProductController {
 
         model.addAttribute("product", new ProductDto());
         model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("pictures", pictureService.getAllProductPictures(null));
         return "product_form";
     }
 
@@ -65,6 +68,7 @@ public class ProductController {
         model.addAttribute("product", productService.findById(id)
                                                     .orElseThrow(() -> new NotFoundException("Product not found")));
         model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("pictures", pictureService.getAllProductPictures(id));
         return "product_form";
     }
 
