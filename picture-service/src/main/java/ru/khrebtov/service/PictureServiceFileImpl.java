@@ -71,6 +71,11 @@ public class PictureServiceFileImpl implements PictureService {
 
     @Override
     public void deleteById(Long id) {
-        pictureRepository.deleteById(id);
+        try {
+            Files.delete(Paths.get(storagePath, pictureRepository.getById(id).getStorageUUID()));
+            pictureRepository.deleteById(id);
+        } catch (IOException e) {
+            logger.error("Can't delete file with id: {}: {} ", id, e.getMessage());
+        }
     }
 }
