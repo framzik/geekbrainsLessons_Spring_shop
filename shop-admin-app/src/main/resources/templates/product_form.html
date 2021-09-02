@@ -46,8 +46,16 @@
       </form>
     </div>
 
-    <div class="col-12">
-      <img th:src="@{/picture/1}" height="150px" alt="Some image">
+    <div class="col-12" th:classappend="${pictures.isEmpty()} ? 'disabled'">
+      <tr th:if="${!pictures.isEmpty()}" th:each="picture: ${pictures}">
+        <img th:src="@{/picture/{id}(id = ${picture.id})}" height="150px" alt="Some image">
+        <td>
+          <form class="d-inline" th:method="delete" th:action="@{/picture/{id}(id = ${picture.id})}">
+            <button type="submit" class="btn btn-danger"><i class="far fa-trash-alt"></i></button>
+          </form>
+        </td>
+      </tr>
+
     </div>
 
   </div>

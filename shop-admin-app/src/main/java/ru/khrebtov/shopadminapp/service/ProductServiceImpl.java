@@ -73,6 +73,9 @@ public class ProductServiceImpl implements ProductService {
 
         if (productDto.getNewPictures() != null) {
             for (MultipartFile newPicture: productDto.getNewPictures()) {
+                if (newPicture.getOriginalFilename().isBlank()) {
+                    break;
+                }
                 try {
                     product.getPictures().add(new Picture(null,
                                                           newPicture.getOriginalFilename(),
