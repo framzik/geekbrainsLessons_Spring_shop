@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.khrebtov.persist.entity.Picture;
 import ru.khrebtov.persist.repo.PictureRepository;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -70,7 +71,13 @@ public class PictureServiceFileImpl implements PictureService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
-        pictureRepository.deleteById(id);
+        try {
+            Files.delete(Paths.get(storagePath, pictureRepository.getById(id).getStorageUUID()));
+            pictureRepository.deleteById(id);
+        } catch (IOException e) {
+            logger.error("Can't delete file with id: {}: {} ", id, e.getMessage());
+        }
     }
 }
