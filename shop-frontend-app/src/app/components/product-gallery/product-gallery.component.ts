@@ -1,0 +1,25 @@
+import { Component, Input, OnInit } from '@angular/core';
+import { AddLineItemDto } from '../../model/add-line-item-dto';
+import { Product } from '../../model/product';
+import { CartService } from '../../services/cart.service';
+
+@Component({
+  selector: 'app-product-gallery',
+  templateUrl: './product-gallery.component.html',
+  styleUrls: [ './product-gallery.component.scss' ]
+})
+export class ProductGalleryComponent implements OnInit {
+
+  @Input() products: Product[] = [];
+
+  constructor(private cartService: CartService) {
+  }
+
+  ngOnInit(): void {
+  }
+
+  addToCart(id: number) {
+    this.cartService.addToCart(new AddLineItemDto(id, 1, '', ''))
+      .subscribe();
+  }
+}

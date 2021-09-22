@@ -1,10 +1,24 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PRODUCT_GALLERY_URL, ProductGallaryComponent } from './pages/product-gallary/product-gallary.component';
+import { AuthGuard } from './helpers/auth-guard';
+import { CART_URL, CartPageComponent } from './pages/cart-page/cart-page.component';
+import { LOGIN_URL, LoginPageComponent } from './pages/login-page/login-page.component';
+import { OrderPageComponent, ORDERS_URL } from './pages/order-page/order-page.component';
+import {
+  PRODUCT_GALLERY_URL,
+  ProductGalleryPageComponent
+} from './pages/product-gallery-page/product-gallery-page.component';
+import { PRODUCT_INFO_URL, ProductInfoPageComponent } from './pages/product-info-page/product-info-page.component';
+import { REGISTER_URL, RegisterPageComponent } from './pages/register-page/register-page.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: PRODUCT_GALLERY_URL },
-  { path: PRODUCT_GALLERY_URL, component: ProductGallaryComponent },
+  { path: PRODUCT_GALLERY_URL, component: ProductGalleryPageComponent },
+  { path: PRODUCT_INFO_URL, component: ProductInfoPageComponent },
+  { path: CART_URL, component: CartPageComponent },
+  { path: LOGIN_URL, component: LoginPageComponent },
+  { path: REGISTER_URL, component: RegisterPageComponent },
+  { path: ORDERS_URL, component: OrderPageComponent, canActivate: [ AuthGuard ] },
 ];
 
 @NgModule({
