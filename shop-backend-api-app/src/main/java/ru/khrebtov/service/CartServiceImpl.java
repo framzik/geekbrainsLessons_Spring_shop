@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
+
 @Service
 @Scope(scopeName = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CartServiceImpl implements CartService {
@@ -26,12 +28,21 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void removeProductQty(ProductDto productDto, String color, String material, int qty) {
-        // TODO
+        LineItem lineItem = new LineItem(productDto, color, material);
+        lineItems.put(lineItem, qty);
     }
 
     @Override
-    public void removeProduct(ProductDto productDto, String color, String material) {
-        // TODO
+    public void removeProduct(ProductDto productDto) {
+        LineItem lineItem = null;
+        for (Map.Entry<LineItem, Integer> entry: lineItems.entrySet()) {
+            if (entry.getKey().getProductDto().getId().equals(productDto.getId())) {
+                lineItem = entry.getKey();
+            }
+        }
+        if (nonNull(lineItem)) {
+            lineItems.remove(lineItem);
+        }
     }
 
     @Override
@@ -46,5 +57,10 @@ public class CartServiceImpl implements CartService {
         return lineItems.keySet()
                         .stream().map(LineItem::getItemTotal)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Override
+    public void removeAll() {
+        lineItems.clear();
     }
 }

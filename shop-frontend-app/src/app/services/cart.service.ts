@@ -19,4 +19,16 @@ export class CartService {
   public addToCart(dto: AddLineItemDto) {
     return this.http.post<any>('api/v1/cart', dto);
   }
+
+  public removeFromCart(id: number) {
+    return this.http.delete<any>('api/v1/cart/delete/' + id);
+  }
+
+  updateQty(lineItemDto: AddLineItemDto) {
+    return this.http.post<any>('api/v1/cart/update_qty', lineItemDto);
+  }
+
+  clear() {
+    return this.http.delete<any>('api/v1/cart');
+  }
 }

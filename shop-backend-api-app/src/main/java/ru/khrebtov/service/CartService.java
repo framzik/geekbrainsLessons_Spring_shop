@@ -12,9 +12,11 @@ public interface CartService {
 
     void removeProductQty(ProductDto productDto, String color, String material, int qty);
 
-    void removeProduct(ProductDto productDto, String color, String material);
+    void removeProduct(ProductDto productDto);
 
     List<LineItem> getLineItems();
 
     BigDecimal getSubTotal();
+
+    void removeAll();
 }
