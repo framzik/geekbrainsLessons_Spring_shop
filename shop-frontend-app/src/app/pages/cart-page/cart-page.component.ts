@@ -35,11 +35,17 @@ export class CartPageComponent implements OnInit {
   }
 
   updateQty(lineItem: LineItem) {
-    this.cartService.updateQty(new AddLineItemDto(lineItem.productId, 2, lineItem.color, lineItem.material))
-      .subscribe();
+    this.cartService.updateQty(new AddLineItemDto(lineItem.productId, lineItem.qty, lineItem.color, lineItem.material))
+      .subscribe(res => {
+        this.content = res;
+      });
   }
 
   clear() {
-    this.cartService.clear().subscribe();
+    this.cartService.clear().subscribe(
+      res => {
+        this.content = res;
+      }
+    );
   }
 }

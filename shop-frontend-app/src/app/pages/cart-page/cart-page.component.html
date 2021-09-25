@@ -17,7 +17,7 @@
         <th scope="row">1</th>
         <td>{{lineItem.productDto.name}}</td>
         <td>
-          <input id="qty" type="number" value="{{lineItem.qty}}" class="form-control w-25"/>
+          <input [(ngModel)]="lineItem.qty" type="number" value="{{lineItem.qty}}" class="form-control w-25"/>
         </td>
         <td>{{lineItem.itemTotal}}</td>
         <td>

@@ -41,7 +41,7 @@ public class CartController {
     }
 
     @PostMapping(path = "/update_qty", produces = "application/json", consumes = "application/json")
-    public List<LineItem> updateQty(@RequestBody AddLineItemDto addLineItemDto) {
+    public AllCartDto updateQty(@RequestBody AddLineItemDto addLineItemDto) {
         logger.info("Update LineItem. ProductId = {}, qty = {}", addLineItemDto.getProductId(),
                     addLineItemDto.getQty());
 
@@ -49,7 +49,7 @@ public class CartController {
                                               .orElseThrow(RuntimeException::new);
         cartService.removeProductQty(productDto, addLineItemDto.getColor(), addLineItemDto.getMaterial(),
                                      addLineItemDto.getQty());
-        return cartService.getLineItems();
+        return new AllCartDto(cartService.getLineItems(), cartService.getSubTotal());
     }
 
     @GetMapping("/all")
@@ -58,14 +58,14 @@ public class CartController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public List<LineItem> deleteProduct(@PathVariable Long id) {
+    public AllCartDto deleteProduct(@PathVariable Long id) {
         logger.info("Delete LineItem. ProductId = {}", id);
 
         ProductDto productDto = productService.findById(id)
                                               .orElseThrow(RuntimeException::new);
         cartService.removeProduct(productDto);
 
-        return cartService.getLineItems();
+        return new AllCartDto(cartService.getLineItems(), cartService.getSubTotal());
     }
 
     @DeleteMapping()
