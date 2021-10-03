@@ -1,40 +1,85 @@
 package ru.khrebtov.service;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.khrebtov.controller.dto.Order;
+import ru.khrebtov.persist.entity.Order;
+import ru.khrebtov.persist.entity.OrderLineItem;
+import ru.khrebtov.persist.entity.Product;
+import ru.khrebtov.persist.entity.User;
+import ru.khrebtov.persist.repo.OrderRepository;
+import ru.khrebtov.persist.repo.ProductRepository;
+import ru.khrebtov.persist.repo.UserRepository;
 
-import java.math.BigDecimal;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@Scope(scopeName = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class OrderServiceImpl implements OrderService {
 
-    private final List<Order> allOrderDto;
+    private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-    public OrderServiceImpl() {
-        this.allOrderDto = new ArrayList<>();
+    private final OrderRepository orderRepository;
+
+    private final CartService cartService;
+
+    private final UserRepository userRepository;
+
+    private final ProductRepository productRepository;
+
+    @Autowired
+    public OrderServiceImpl(OrderRepository orderRepository,
+                            CartService cartService,
+                            UserRepository userRepository,
+                            ProductRepository productRepository) {
+        this.orderRepository = orderRepository;
+        this.cartService = cartService;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 
-    @JsonCreator
-    public OrderServiceImpl(List<Order> allOrderDto) {
-        this.allOrderDto = allOrderDto;
+    public List<Order> findOrdersByUsername(String username) {
+        return orderRepository.findAllByUsername(username);
     }
 
-    @Override
-    public List<Order> getAllCartDtos() {
-        return allOrderDto;
+    @Transactional
+    public void createOrder(String username) {
+        if (cartService.getLineItems().isEmpty()) {
+            logger.info("Can't create order for empty Cart");
+            return;
+        }
+
+        User user = userRepository.findByUsername(username)
+                                  .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Order order = orderRepository.save(new Order(
+                null,
+                LocalDateTime.now(),
+                Order.OrderStatus.CREATED,
+                user
+        ));
+
+        List<OrderLineItem> orderLineItems = cartService.getLineItems()
+                                                        .stream()
+                                                        .map(li -> new OrderLineItem(
+                                                                null,
+                                                                order,
+                                                                findProductById(li.getProductId()),
+                                                                li.getProductDto().getPrice(),
+                                                                li.getQty(),
+                                                                li.getColor(),
+                                                                li.getMaterial()
+                                                        ))
+                                                        .collect(Collectors.toList());
+        order.setOrderLineItems(orderLineItems);
+        orderRepository.save(order);
     }
 
-    @Override
-    public List<Order> addOrder(BigDecimal subtotal) {
-        Order order = new Order(1L, subtotal, LocalDateTime.now());
-        allOrderDto.add(order);
-        return allOrderDto;
+    private Product findProductById(Long id) {
+        return productRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("No product with id"));
     }
 }

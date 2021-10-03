@@ -1,12 +1,15 @@
 package ru.khrebtov.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import ru.khrebtov.controller.dto.AllCartDto;
-import ru.khrebtov.controller.dto.Order;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.khrebtov.persist.entity.Order;
 import ru.khrebtov.service.OrderService;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @PreAuthorize("isAuthenticated()")
@@ -16,20 +19,18 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    @Autowired
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
-    @GetMapping("/all")
-    public List<Order> findAll() {
-        return orderService.getAllCartDtos();
+    @PostMapping
+    public void createOrder(Authentication auth) {
+        orderService.createOrder(auth.getName());
     }
 
-    @PostMapping(produces = "application/json", consumes = "application/json")
-    public List<Order> addOrder(@RequestBody AllCartDto allCartDto) {
-        if (allCartDto.getSubtotal().compareTo(new BigDecimal("0.00")) <= 0) {
-            return orderService.getAllCartDtos();
-        }
-        return orderService.addOrder(allCartDto.getSubtotal());
+    @GetMapping("/all")
+    public List<Order> findAll(Authentication auth) {
+        return orderService.findOrdersByUsername(auth.getName());
     }
 }
