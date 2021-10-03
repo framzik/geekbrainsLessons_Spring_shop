@@ -1,6 +1,7 @@
 package ru.khrebtov.persist.entity;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +20,9 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    @Column(name = "sub_total")
+    private BigDecimal subTotal;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
@@ -29,11 +33,12 @@ public class Order {
     public Order() {
     }
 
-    public Order(Long id, LocalDateTime orderDate, OrderStatus status, User user) {
+    public Order(Long id, LocalDateTime orderDate, OrderStatus status, User user, BigDecimal subTotal) {
         this.id = id;
         this.orderDate = orderDate;
         this.status = status;
         this.user = user;
+        this.subTotal = subTotal;
     }
 
     public Long getId() {
@@ -74,6 +79,14 @@ public class Order {
 
     public void setOrderLineItems(List<OrderLineItem> orderLineItems) {
         this.orderLineItems = orderLineItems;
+    }
+
+    public BigDecimal getSubTotal() {
+        return subTotal;
+    }
+
+    public void setSubTotal(BigDecimal subTotal) {
+        this.subTotal = subTotal;
     }
 
     public enum OrderStatus {

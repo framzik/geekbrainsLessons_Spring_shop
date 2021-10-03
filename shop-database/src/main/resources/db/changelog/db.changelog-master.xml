@@ -48,5 +48,17 @@
         <tagDatabase tag="v-6.0"/>
     </changeSet>
 
+    <include file="v-7.0/root.changelog.v-7.0.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="7000" author="framzik">
+        <tagDatabase tag="v-7.0"/>
+    </changeSet>
+
+    <include file="v-8.0/root.changelog.v-8.0.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="8000" author="framzik">
+        <tagDatabase tag="v-8.0"/>
+    </changeSet>
+
 
 </databaseChangeLog>

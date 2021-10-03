@@ -1,12 +1,13 @@
 package ru.khrebtov.service;
 
-import ru.khrebtov.persist.entity.Order;
+import ru.khrebtov.controller.dto.AllCartDto;
+import ru.khrebtov.controller.dto.OrderDto;
 
 import java.util.List;
 
 public interface OrderService {
 
-    List<Order> findOrdersByUsername(String username);
+    List<OrderDto> findOrdersByUsername(String username);
 
-    void createOrder(String username);
+    void createOrder(String username, AllCartDto allCartDto);
 }
