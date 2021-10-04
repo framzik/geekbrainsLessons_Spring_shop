@@ -3,6 +3,7 @@ import { AddLineItemDto } from '../../model/add-line-item-dto';
 import { AllCartDto } from '../../model/all-cart-dto';
 import { LineItem } from '../../model/line-item';
 import { CartService } from '../../services/cart.service';
+import { OrderService } from '../../services/order.service';
 
 export const CART_URL = 'cart';
 
@@ -15,7 +16,7 @@ export class CartPageComponent implements OnInit {
 
   content?: AllCartDto;
 
-  constructor(private cartService: CartService) {
+  constructor(private cartService: CartService, private orderService: OrderService) {
   }
 
   ngOnInit(): void {
@@ -47,5 +48,10 @@ export class CartPageComponent implements OnInit {
         this.content = res;
       }
     );
+  }
+
+  createOrder(order: AllCartDto) {
+    this.orderService.createOrder(order).subscribe();
+    this.clear();
   }
 }
