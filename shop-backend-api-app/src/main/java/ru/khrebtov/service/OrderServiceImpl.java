@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import ru.khrebtov.controller.dto.AllCartDto;
 import ru.khrebtov.controller.dto.OrderDto;
@@ -18,7 +17,6 @@ import ru.khrebtov.persist.repo.OrderRepository;
 import ru.khrebtov.persist.repo.ProductRepository;
 import ru.khrebtov.persist.repo.UserRepository;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,21 +37,17 @@ public class OrderServiceImpl implements OrderService {
 
     private final RabbitTemplate rabbitTemplate;
 
-    private final SimpMessagingTemplate template;
-
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
                             CartService cartService,
                             UserRepository userRepository,
                             ProductRepository productRepository,
-                            RabbitTemplate rabbitTemplate,
-                            SimpMessagingTemplate template) {
+                            RabbitTemplate rabbitTemplate) {
         this.orderRepository = orderRepository;
         this.cartService = cartService;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.rabbitTemplate = rabbitTemplate;
-        this.template = template;
     }
 
     public List<OrderDto> findOrdersByUsername(String username) {
@@ -63,7 +57,6 @@ public class OrderServiceImpl implements OrderService {
                               .collect(toList());
     }
 
-    @Transactional
     @Override
     public void createOrder(String username, AllCartDto allCartDto) {
         if (cartService.getLineItems().isEmpty()) {
@@ -74,13 +67,12 @@ public class OrderServiceImpl implements OrderService {
         User user = userRepository.findByUsername(username)
                                   .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Order order = orderRepository.save(new Order(
-                null,
-                LocalDateTime.now(),
-                Order.OrderStatus.CREATED,
-                user,
-                allCartDto.getSubtotal()
-        ));
+        Order order = new Order(null,
+                                LocalDateTime.now(),
+                                Order.OrderStatus.CREATED,
+                                user,
+                                allCartDto.getSubtotal()
+        );
 
         List<OrderLineItem> orderLineItems = cartService.getLineItems()
                                                         .stream()
@@ -96,6 +88,7 @@ public class OrderServiceImpl implements OrderService {
                                                         .collect(toList());
         order.setOrderLineItems(orderLineItems);
         orderRepository.save(order);
+        cartService.removeAll();
         rabbitTemplate.convertAndSend("order.exchange", "new_order",
                                       new OrderMessage(order.getId(), order.getStatus().name()));
     }
@@ -108,6 +101,5 @@ public class OrderServiceImpl implements OrderService {
     @RabbitListener(queues = "processed.order.queue")
     public void receive(OrderMessage order) {
         logger.info("Order with id '{}' state change to '{}'", order.getId(), order.getState());
-        template.convertAndSend("/order_out/order", order);
     }
 }
