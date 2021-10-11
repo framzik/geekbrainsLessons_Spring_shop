@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import ru.khrebtov.service.dto.OrderMessage;
+import ru.khrebtov.controller.dto.OrderMessage;
 
 @RabbitListener(queues = "new.order.queue")
 public class RabbitMqReceiver {

@@ -1,4 +1,4 @@
-package ru.khrebtov.service.dto;
+package ru.khrebtov.controller.dto;
 
 public class OrderMessage {
 

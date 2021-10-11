@@ -19,6 +19,7 @@ import ru.khrebtov.persist.repo.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -99,7 +100,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @RabbitListener(queues = "processed.order.queue")
-    public void receive(OrderMessage order) {
-        logger.info("Order with id '{}' state change to '{}'", order.getId(), order.getState());
+    public void receive(OrderMessage msg) {
+        logger.info("Order with id '{}' state change to '{}'", msg.getId(), msg.getState());
+        Optional<Order> order = orderRepository.findById(msg.getId());
+        if (order.isPresent()) {
+            for (Order.OrderStatus status: Order.OrderStatus.values()) {
+                if (status.name().equals(msg.getState())) {
+                    order.get().setStatus(status);
+                    break;
+                }
+            }
+            orderRepository.save(order.get());
+        }
     }
 }
