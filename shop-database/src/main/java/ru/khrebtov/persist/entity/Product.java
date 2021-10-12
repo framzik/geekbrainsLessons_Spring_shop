@@ -39,6 +39,9 @@ public class Product {
     @ManyToOne
     private Brand brand;
 
+    @OneToMany(mappedBy = "order")
+    private List<OrderLineItem> orderLineItems;
+
     public Product() {
     }
 
@@ -109,6 +112,14 @@ public class Product {
 
     public void setPictures(List<Picture> pictures) {
         this.pictures = pictures;
+    }
+
+    public List<OrderLineItem> getOrderLineItems() {
+        return orderLineItems;
+    }
+
+    public void setOrderLineItems(List<OrderLineItem> orderLineItems) {
+        this.orderLineItems = orderLineItems;
     }
 
     @Override

@@ -1,13 +1,13 @@
 package ru.khrebtov.service;
 
-import ru.khrebtov.controller.dto.Order;
+import ru.khrebtov.controller.dto.AllCartDto;
+import ru.khrebtov.controller.dto.OrderDto;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public interface OrderService {
 
-    List<Order> getAllCartDtos();
+    List<OrderDto> findOrdersByUsername(String username);
 
-    public List<Order> addOrder(BigDecimal subtotal);
+    void createOrder(String username, AllCartDto allCartDto);
 }
