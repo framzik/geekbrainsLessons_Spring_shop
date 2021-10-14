@@ -32,6 +32,7 @@
         <module>spring-eureka</module>
         <module>spring-cloud-config</module>
         <module>spring-cloud-gateway</module>
+        <module>shop-delivery-service</module>
     </modules>
 
     <dependencyManagement>

@@ -2,10 +2,13 @@ package ru.khrebtov.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.khrebtov.controller.dto.AllCartDto;
 import ru.khrebtov.controller.dto.OrderDto;
+import ru.khrebtov.controller.dto.OrderMessage;
 import ru.khrebtov.persist.entity.Order;
 import ru.khrebtov.persist.entity.OrderLineItem;
 import ru.khrebtov.persist.entity.Product;
@@ -14,9 +17,9 @@ import ru.khrebtov.persist.repo.OrderRepository;
 import ru.khrebtov.persist.repo.ProductRepository;
 import ru.khrebtov.persist.repo.UserRepository;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -33,15 +36,19 @@ public class OrderServiceImpl implements OrderService {
 
     private final ProductRepository productRepository;
 
+    private final RabbitTemplate rabbitTemplate;
+
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
                             CartService cartService,
                             UserRepository userRepository,
-                            ProductRepository productRepository) {
+                            ProductRepository productRepository,
+                            RabbitTemplate rabbitTemplate) {
         this.orderRepository = orderRepository;
         this.cartService = cartService;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public List<OrderDto> findOrdersByUsername(String username) {
@@ -51,7 +58,6 @@ public class OrderServiceImpl implements OrderService {
                               .collect(toList());
     }
 
-    @Transactional
     @Override
     public void createOrder(String username, AllCartDto allCartDto) {
         if (cartService.getLineItems().isEmpty()) {
@@ -62,13 +68,12 @@ public class OrderServiceImpl implements OrderService {
         User user = userRepository.findByUsername(username)
                                   .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Order order = orderRepository.save(new Order(
-                null,
-                LocalDateTime.now(),
-                Order.OrderStatus.CREATED,
-                user,
-                allCartDto.getSubtotal()
-        ));
+        Order order = new Order(null,
+                                LocalDateTime.now(),
+                                Order.OrderStatus.CREATED,
+                                user,
+                                allCartDto.getSubtotal()
+        );
 
         List<OrderLineItem> orderLineItems = cartService.getLineItems()
                                                         .stream()
@@ -84,10 +89,28 @@ public class OrderServiceImpl implements OrderService {
                                                         .collect(toList());
         order.setOrderLineItems(orderLineItems);
         orderRepository.save(order);
+        cartService.removeAll();
+        rabbitTemplate.convertAndSend("order.exchange", "new_order",
+                                      new OrderMessage(order.getId(), order.getStatus().name()));
     }
 
     private Product findProductById(Long id) {
         return productRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("No product with id"));
+    }
+
+    @RabbitListener(queues = "processed.order.queue")
+    public void receive(OrderMessage msg) {
+        logger.info("Order with id '{}' state change to '{}'", msg.getId(), msg.getState());
+        Optional<Order> order = orderRepository.findById(msg.getId());
+        if (order.isPresent()) {
+            for (Order.OrderStatus status: Order.OrderStatus.values()) {
+                if (status.name().equals(msg.getState())) {
+                    order.get().setStatus(status);
+                    break;
+                }
+            }
+            orderRepository.save(order.get());
+        }
     }
 }
