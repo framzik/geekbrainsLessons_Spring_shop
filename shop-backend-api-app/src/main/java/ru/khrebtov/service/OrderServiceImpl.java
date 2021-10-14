@@ -107,17 +107,18 @@ public class OrderServiceImpl implements OrderService {
     @RabbitListener(queues = "processed.order.queue")
     public void receive(OrderMessage msg) {
         logger.info("Order with id '{}' state change to '{}'", msg.getId(), msg.getState());
-        Optional<Order> order = orderRepository.findById(msg.getId());
-        if (order.isPresent()) {
+        Optional<Order> oOrder = orderRepository.findById(msg.getId());
+        if (oOrder.isPresent()) {
+            Order order = oOrder.get();
             for (Order.OrderStatus status: Order.OrderStatus.values()) {
                 if (status.name().equals(msg.getState())) {
-                    order.get().setStatus(status);
+                    order.setStatus(status);
                     break;
                 }
             }
-            orderRepository.save(order.get());
+            orderRepository.save(order);
+            template.convertAndSend("/order_out/order",
+                                    new OrderDto(order.getId(), order.getStatus()));
         }
-
-        template.convertAndSend("/order_out/order", order);
     }
 }
