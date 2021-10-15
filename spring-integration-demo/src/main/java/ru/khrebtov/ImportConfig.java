@@ -18,6 +18,7 @@ import org.springframework.integration.jpa.dsl.Jpa;
 import org.springframework.integration.jpa.dsl.JpaUpdatingOutboundEndpointSpec;
 import org.springframework.integration.jpa.support.PersistMode;
 import org.springframework.messaging.MessageHandler;
+import ru.khrebtov.persist.entity.Category;
 import ru.khrebtov.persist.entity.Product;
 
 import javax.persistence.EntityManagerFactory;
@@ -83,7 +84,8 @@ public class ImportConfig {
                                    BigDecimal price = new BigDecimal(columns.get(1));
                                    String description = columns.get(2);
 
-                                   return new Product(name, price, description);
+                                   return new Product(name, price, description, new Category(3L, "From CSV", "Some " +
+                                           "products"));
                                })
                                .handle(jpaPersistHandler(), ConsumerEndpointSpec::transactional)
                                .get();
