@@ -22,6 +22,11 @@ public class OrderDto {
         this.status = status;
     }
 
+    public OrderDto(Long id, Order.OrderStatus status) {
+        this.id = id;
+        this.status = status;
+    }
+
     public OrderDto(Order order) {
         this(order.getId(), order.getSubTotal(), order.getOrderDate(), order.getStatus());
     }

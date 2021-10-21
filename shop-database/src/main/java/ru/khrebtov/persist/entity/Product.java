@@ -50,6 +50,13 @@ public class Product {
         this.price = price;
     }
 
+    public Product(String name, BigDecimal price, String description, Category category) {
+        this(name, price);
+
+        this.description = description;
+        this.category = category;
+    }
+
     public Product(Long id, String name, String description, BigDecimal price, Category category) {
         this.id = id;
         this.name = name;

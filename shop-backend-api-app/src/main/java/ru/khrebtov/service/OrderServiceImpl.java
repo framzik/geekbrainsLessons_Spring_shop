@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import ru.khrebtov.controller.dto.AllCartDto;
 import ru.khrebtov.controller.dto.OrderDto;
@@ -38,17 +39,21 @@ public class OrderServiceImpl implements OrderService {
 
     private final RabbitTemplate rabbitTemplate;
 
+    private final SimpMessagingTemplate template;
+
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository,
                             CartService cartService,
                             UserRepository userRepository,
                             ProductRepository productRepository,
-                            RabbitTemplate rabbitTemplate) {
+                            RabbitTemplate rabbitTemplate,
+                            SimpMessagingTemplate template) {
         this.orderRepository = orderRepository;
         this.cartService = cartService;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.template = template;
     }
 
     public List<OrderDto> findOrdersByUsername(String username) {
@@ -102,15 +107,18 @@ public class OrderServiceImpl implements OrderService {
     @RabbitListener(queues = "processed.order.queue")
     public void receive(OrderMessage msg) {
         logger.info("Order with id '{}' state change to '{}'", msg.getId(), msg.getState());
-        Optional<Order> order = orderRepository.findById(msg.getId());
-        if (order.isPresent()) {
+        Optional<Order> oOrder = orderRepository.findById(msg.getId());
+        if (oOrder.isPresent()) {
+            Order order = oOrder.get();
             for (Order.OrderStatus status: Order.OrderStatus.values()) {
                 if (status.name().equals(msg.getState())) {
-                    order.get().setStatus(status);
+                    order.setStatus(status);
                     break;
                 }
             }
-            orderRepository.save(order.get());
+            orderRepository.save(order);
+            template.convertAndSend("/order_out/order",
+                                    new OrderDto(order.getId(), order.getStatus()));
         }
     }
 }
