@@ -65,10 +65,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void createOrder(String username, AllCartDto allCartDto) {
-        if (cartService.getLineItems().isEmpty()) {
-            logger.info("Can't create order for empty Cart");
-            return;
-        }
+//        if (cartService.getLineItems().isEmpty()) {
+//            logger.info("Can't create order for empty Cart");
+//            return;
+//        }
 
         User user = userRepository.findByUsername(username)
                                   .orElseThrow(() -> new RuntimeException("User not found"));
