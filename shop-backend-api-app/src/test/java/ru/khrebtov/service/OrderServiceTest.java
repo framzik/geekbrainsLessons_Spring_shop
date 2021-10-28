@@ -80,9 +80,10 @@ public class OrderServiceTest {
         List<LineItem> lineItems = List.of(e1);
         cartService = new CartServiceImpl(lineItems);
 
-        AllCartDto cartDto = new AllCartDto(lineItems, new BigDecimal(9));
+        AllCartDto cartDto = new AllCartDto(lineItems, new BigDecimal("9.00"));
         orderService.createOrder(vasya.getUsername(), cartDto);
         List<OrderDto> ordersByUsername = orderService.findOrdersByUsername(vasya.getUsername());
         assertFalse(ordersByUsername.isEmpty());
+        assertEquals(ordersByUsername.get(0).getPrice(), cartDto.getSubtotal());
     }
 }
