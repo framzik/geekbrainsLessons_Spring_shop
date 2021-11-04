@@ -8,6 +8,15 @@ services:
   delivery-service:
     image: registry.heroku.com/geek-shop-delivery-service/web:latest
 
+  shop-frontend-app:
+    image: shop-frontend-app
+    ports:
+      - 8080:80
+    restart: always
+    depends_on:
+      - admin-app
+      - backend-app
+
   spring-integration-service:
     image: registry.heroku.com/geek-spring-integration-demo/web:latest
     command: bash -c "/apps/wait-for-service.sh && /apps/entrypoint.sh"
@@ -15,7 +24,7 @@ services:
   admin-app:
     image: registry.heroku.com/geek-shop-admin-app/web:latest
     ports:
-      - 8081:8081
+      - 8080
     volumes:
       - file-storage:/var/storage
     command: bash -c "/apps/wait-for-service.sh && /apps/wait-for-service.sh cloud-config 8888 && /apps/entrypoint.sh"
@@ -23,7 +32,7 @@ services:
   backend-app:
     image: registry.heroku.com/geek-shop-backend-api-app/web:latest
     ports:
-      - 8080:8080
+      - 8080
     command: bash -c "/apps/wait-for-service.sh && /apps/wait-for-service.sh cloud-config 8888 && /apps/entrypoint.sh"
 
   redis:
