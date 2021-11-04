@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LoginSteps {
 
-    private WebDriver webDriver = null;
+    public static WebDriver webDriver = null;
 
     @Given("^I open web browser$")
     public void iOpenWebBrowser() throws Throwable {
@@ -22,20 +22,17 @@ public class LoginSteps {
 
     @When("^I navigate to login\\.html page$")
     public void iNavigateToLoginHtmlPage() throws Throwable {
-        Thread.sleep(3000);
         webDriver.get(DriverInitializer.getProperty("login.url"));
     }
 
     @When("^I click on login button$")
     public void iClickOnLoginButton() throws Throwable {
-        Thread.sleep(3000);
         WebElement webElement = webDriver.findElement(By.id("btn-login"));
         webElement.click();
     }
 
     @When("^I provide username as \"([^\"]*)\" and password as \"([^\"]*)\"$")
     public void iProvideUsernameAsAndPasswordAs(String username, String password) throws Throwable {
-        Thread.sleep(3000);
         WebElement webElement = webDriver.findElement(By.id("username"));
         webElement.sendKeys(username);
         webElement = webDriver.findElement(By.id("password"));

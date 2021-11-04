@@ -1,9 +1,7 @@
 package ru.khrebtov.shopuitests;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 
 import java.util.Properties;
 
@@ -21,17 +19,19 @@ public class DriverInitializer {
     }
 
     public static WebDriver getDriver() {
-        switch (getProperty("browser")) {
-            case "chrome":
-                WebDriverManager.chromedriver().setup();
-                return new ChromeDriver();
-            case "firefox":
-                WebDriverManager.firefoxdriver().setup();
-                return new FirefoxDriver();
-            default:
-                WebDriverManager.chromedriver().setup();
-                return new ChromeDriver();
-        }
+        System.setProperty("webdriver.chrome.driver", "chromedriver");
+
+//        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("enable-automation");
+//        options.addArguments("--headless");
+//        options.addArguments("--window-size=1920,1080");
+//        options.addArguments("--no-sandbox");
+//        options.addArguments("--disable-extensions");
+//        options.addArguments("--dns-prefetch-disable");
+//        options.addArguments("--disable-gpu");
+//        options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
+
+        return new ChromeDriver();
     }
 
     public static String getProperty(String key) {
