@@ -1,7 +1,6 @@
-package ru.khrebtov.shopbackendapiapp;
+package ru.khrebtov;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 //@SpringBootTest
 class ShopBackendApiAppApplicationTests {
